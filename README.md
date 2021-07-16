@@ -17,6 +17,7 @@ ______
 ______
 - SpringCloud和Dubbo有哪些区别?
 ![SpringCloud和Dubbo对比](https://img2020.cnblogs.com/blog/1952640/202107/1952640-20210716104142935-648074584.png)  
+
 **最大区别：SpringCloud抛弃了Dubbo的RPC通信，采用的是基于Http的REST方式。**  
 ```
 严格来说，这两种方式各有优劣。虽然从一定程度上来说，SpringCloud牺牲了服务调用的性能，但也避免了上面提到的原生RPC带来的问题。
