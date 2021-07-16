@@ -14,6 +14,7 @@
 ```
 - 微服务之间是如何独立通讯的?
 - SpringCloud和Dubbo有哪些区别?
+![SpringCloud和Dubbo对比](https://img2020.cnblogs.com/blog/1952640/202107/1952640-20210716104142935-648074584.png)
 - SpringBoot和SpringCloud，请你谈谈对他们的理解
 ```
 - SpringBoot专注于快速方便的开发单个个体微服务。
