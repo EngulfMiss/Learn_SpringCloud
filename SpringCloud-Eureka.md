@@ -39,3 +39,5 @@ public class EurekaServer_7001 {
     }
 }
 ```
+
+**Client与上面类似**
