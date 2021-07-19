@@ -173,3 +173,62 @@ public class DeptConsumer_80 {
     }
 }
 ```
+
+## Feign负载均衡
+### 简介
+feign是声明式的web service客户端，它让微服务之间的调用变得更加得到简单，类似于controller调用service.  
+SpringCloud集成了Ribbon和Eureka，可在使用Feign时提供负载均衡的http客户端  
+调用微服务访问的两种方法：  
+1. 微服务名字[ribbon]
+2. 接口和注解[feign]
+
+### Feign能干什么?
+- Feign旨在使编写Java Http客户端变得更容易
+- 前面在使用Ribbon + RestTemplate时，利用RestTemplate对Http请求的封装处理，形成了一套模板化的调用方法。  
+但是在实际开发中，由于对服务依赖的调用可能不止一处，往往一个接口会被多处调用，所以通常都会针对每个微服务自行  
+封装一些客户端类来包装这些依赖服务的调用。所以，Feign在此基础上做了进一步封装，由他来帮助我们定义和实现依赖  
+服务接口的定义，=-在Feign的实现下，我们只需要创建一个接口并使用注解的方式来配置它(类似于以前Dao接口上标注  
+Mapper注解，现在是一个微服务接口上面标注一个Feign注解即可。)F=即可完成对服务提供方的接口绑定，简化了使用  
+Spring Cloud Ribbon时，自动封装服务调用客户端的开发量。
+- Feign集成了Ribbon
+利用Ribbon维护了MicroServiceCloud-Dept的服务列表信息，并且通过轮询实现了客户端的负载均衡,而与Ribbon不同  
+的是，通过Feign只需要定义服务绑定接口且以声明式的方法，优雅而且简单的实现了服务调用。
+
+## Feign使用
+- 依赖
+```xml
+<!-- Feign -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-openfeign</artifactId>
+    <version>2.2.6.RELEASE</version>
+</dependency>
+```
+
+- 给服务接口添加@FeignClient(value = "SPRINGCLOUD-PROVIDER-DEPT")注解,value为服务名称
+```java
+@Component
+@FeignClient(value = "SPRINGCLOUD-PROVIDER-DEPT")  //从哪个服务拿
+public interface DeptClientService {
+    @GetMapping("/dept/{pid}")
+    Dept selectById(@PathVariable("pid") Integer id);
+
+    @GetMapping("/dept/all")
+    List<Dept> selectAll();
+
+    @PostMapping("/dept/add")
+    int addDept(Dept dept);
+}
+```
+
+- 客户端启动类添加注解，开启支持
+```java
+@SpringBootApplication(scanBasePackages = "com.engulf.springcloud")
+@EnableEurekaClient
+@EnableFeignClients(basePackages = {"com.engulf.springcloud"})
+public class FeignDeptConsumer_80 {
+    public static void main(String[] args) {
+        SpringApplication.run(FeignDeptConsumer_80.class,args);
+    }
+}
+```
