@@ -16,3 +16,44 @@
     - 进程式LB
       - 将LB逻辑集成到消费方，消费方从服务注册中心获知有哪些地址可用，然后自己再从这些地址中选出一个合适的服务器。
       - Ribbon就属于进程内LB，它只是一个类库，集成于消费方进程，消费方通过它来获取到服务提供方的地址
+
+
+## Ribbon使用
+- 导入依赖  
+由于客户端要向Eureka中获取注册列表，因此两个依赖都要  
+```xml
+<!-- 负载均衡Ribbon -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+</dependency>
+
+<!-- eureka中获取注册列表 -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+</dependency>
+```
+- 编写配置文件
+```properties
+server:
+  port: 80
+
+# eureka配置
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/  # 哪些注册中心可以提供服务
+```
+- 为RestTemplate配置类添加注解
+```java
+@Configuration
+public class ConfigBean {
+    @Bean
+    //配置负载均衡实现
+    @LoadBalanced  //Ribbon
+    public RestTemplate getRestTemplate(){
+        return new RestTemplate();
+    }
+}
+```
