@@ -17,7 +17,9 @@ public class DeptConsumerController {
     private RestTemplate restTemplate;  //提供多种便捷访问远程http服务的方法，简单的restful服务模板
 
     //请求服务地址前缀常量
-    private static final String staticUrl = "http://localhost:8001";
+//    private static final String staticUrl = "http://localhost:8001";
+    //但如果使用Ribbon，我们这里的地址就应该使用的是一个变量，通过服务名来访问
+    private String staticUrl = "http://SPRINGCLOUD-PROVIDER-DEPT";
 
     @GetMapping("/consumer/dept/get/{id}")
     public Dept get(@PathVariable("id") Integer id){
@@ -32,6 +34,11 @@ public class DeptConsumerController {
     @RequestMapping("/consumer/dept/add")
     public boolean addDept(Dept dept){
         return restTemplate.postForObject(staticUrl+"/dept/add",dept,Boolean.class);
+    }
+
+    @GetMapping("/test80")
+    public String test_80(){
+        return restTemplate.getForObject(staticUrl+"/test",String.class);
     }
 
 

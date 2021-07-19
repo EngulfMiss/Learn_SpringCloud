@@ -6,9 +6,11 @@
     <select id="selectAll" resultType="dept">
         select * from cloud01.dept
     </select>
-    <select id="selectDeptById" resultType="dept" parameterType="int">
+
+    <select id="selectDeptById" parameterType="int" resultType="dept">
         select * from cloud01.dept where deptId = #{id}
     </select>
+
     <insert id="addDept" parameterType="dept">
         insert into cloud01.dept(deptId, deptName, db_source) values (#{deptId},#{deptName},#{db_source})
     </insert>
