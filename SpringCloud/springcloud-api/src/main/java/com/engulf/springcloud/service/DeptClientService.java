@@ -9,7 +9,6 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
-@Component
 @FeignClient(value = "SPRINGCLOUD-PROVIDER-DEPT")  //从哪个服务拿
 public interface DeptClientService {
     @GetMapping("/dept/{pid}")
