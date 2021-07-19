@@ -57,3 +57,119 @@ public class ConfigBean {
     }
 }
 ```
+
+## 自定义负载均衡策略
+
+**官方解释**  
+Spring Cloud还允许您通过使用@RibbonClient声明其他配置（位于RibbonClientConfiguration之上）来完全控制客户端。例：  
+```java
+@Configuration
+@RibbonClient(name = "foo", configuration = FooConfiguration.class)
+public class TestConfiguration {
+}
+```
+
+
+- 注意不要和springboot主启动类同级，以免被扫描直接替换组件，在启动类的上一级目录创建一个文件夹  
+编写一个配置类和一个自定义负载均衡策略
+- 配置类
+```java
+@Configuration
+public class EngulfRule {
+    @Bean
+    public IRule myRule(){
+        return new EngulfRandomRule();  //使用自定义负载均衡策略
+    }
+}
+```
+
+- 自定义负载均衡策略(参考IRule接口的实现类)
+```java
+public class EngulfRandomRule extends AbstractLoadBalancerRule {
+
+    //每个服务访问5次，换下一个服务(共3个服务)
+
+    //total=0，默认=0，如果=5，我们指向下一个服务节点
+    //index=0 如果total=5 index+1 total重置
+
+    private int total = 0;  //被调用的次数
+    private int currentIndex = 0;
+    
+    public Server choose(ILoadBalancer lb, Object key) {
+        if (lb == null) {
+            return null;
+        } else {
+            Server server = null;
+
+            while(server == null) {
+                if (Thread.interrupted()) {
+                    return null;
+                }
+
+                List<Server> upList = lb.getReachableServers();  //获得活着的服务
+                List<Server> allList = lb.getAllServers();  //获得全部的服务
+                int serverCount = allList.size();
+                if (serverCount == 0) {
+                    return null;
+                }
+
+//                int index = this.chooseRandomInt(serverCount);  //生成区间随机数
+//                server = (Server)upList.get(index);  //从活着的服务中随机获取
+
+                //====================================== 开始自定义规则
+
+                if(total < 5){
+                    server = upList.get(currentIndex);
+                    total++;
+                }else {
+                    total = 0;
+                    currentIndex++;
+                    if (currentIndex > upList.size() - 1){
+                        currentIndex = 0;
+                    }
+                    server = upList.get(currentIndex);  //从活着的服务中，获取指定的服务来进行操作
+                }
+
+                //======================================
+
+                if (server == null) {
+                    Thread.yield();
+                } else {
+                    if (server.isAlive()) {
+                        return server;
+                    }
+
+                    server = null;
+                    Thread.yield();
+                }
+            }
+
+            return server;
+        }
+    }
+
+    protected int chooseRandomInt(int serverCount) {
+        return ThreadLocalRandom.current().nextInt(serverCount);
+    }
+
+    public Server choose(Object key) {
+        return this.choose(this.getLoadBalancer(), key);
+    }
+
+    public void initWithNiwsConfig(IClientConfig clientConfig) {
+    }
+}
+```
+
+- 在启动类中添加注解
+```java
+@SpringBootApplication
+@EnableEurekaClient
+//在微服务启动的时候就能去加载我们自定义负载均衡类(IRule)
+@RibbonClient(name = "SPRINGCLOUD-PROVIDER-DEPT",configuration = EngulfRule.class)  //name对哪个服务进行负载均衡,指定配置类
+public class DeptConsumer_80 {
+    public static void main(String[] args) {
+        SpringApplication.run(DeptConsumer_80.class,args);
+    }
+}
+```
