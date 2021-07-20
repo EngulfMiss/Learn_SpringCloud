@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 
 import java.util.List;
 
-@FeignClient(value = "SPRINGCLOUD-PROVIDER-DEPT")  //从哪个服务拿
+@FeignClient(value = "SPRINGCLOUD-PROVIDER-DEPT",fallbackFactory = DeptClientServiceFallBackFactory.class)  //从哪个服务拿 //指定服务降级
 public interface DeptClientService {
     @GetMapping("/dept/{pid}")
     Dept selectById(@PathVariable("pid") Integer id);
