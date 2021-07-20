@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.engulf.springcloud.mapper.DeptMapper">
+    <select id="selectAll" resultType="dept">
+        select * from cloud01.dept
+    </select>
+
+    <select id="selectDeptById" parameterType="int" resultType="dept">
+        select * from cloud01.dept where deptId = #{id}
+    </select>
+
+    <insert id="addDept" parameterType="dept">
+        insert into cloud01.dept(deptId, deptName, db_source) values (#{deptId},#{deptName},#{db_source})
+    </insert>
+</mapper>
