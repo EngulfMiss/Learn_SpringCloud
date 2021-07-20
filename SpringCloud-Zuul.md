@@ -62,3 +62,44 @@ Zuul自身注册为Eureka服务治理下的应用，同时从Eureka中获得其�
 </dependency>
 </dependencies>
 ```
+
+- 编写配置
+```yml
+server:
+  port: 9527
+
+spring:
+  application:
+    name: springcloud-zuul-gateway
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7003.com:7003/eureka/,http://eureka7002.com:7002/eureka/
+  instance:
+    instance-id: zuul9527.com
+    prefer-ip-address: true
+
+zuul:
+  routes:
+    my.serviceId: springcloud-provider-dept    # 将微服务访问路径设置为自定义的路径来防止服务暴露
+    my.path: /mydept/**
+  ignored-services: springcloud-provider-dept  # 不能再使用这个路径访问    设置为 * 表示隐藏全部真实微服务路径，只使用自己配置的访问
+  prefix: /engulf   # 设置公共的前缀
+
+
+
+info:
+  app.name: engulf-springcloud
+```
+
+- 启动类开启支持
+```java
+@SpringBootApplication
+@EnableZuulProxy
+public class ZuulApplication_9527 {
+    public static void main(String[] args) {
+        SpringApplication.run(ZuulApplication_9527.class,args);
+    }
+}
+```
