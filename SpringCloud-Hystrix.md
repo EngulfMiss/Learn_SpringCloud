@@ -137,3 +137,87 @@ feign:
 
 
 ## Hystrix客户端监控
+- 新建项目导入依赖(Hystrix的那两个)
+```xml
+        <!-- Hystrix监控 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix-dashboard</artifactId>
+        </dependency>
+
+
+        <!-- Hystrix -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-hystrix</artifactId>
+        </dependency>
+
+        <!-- 负载均衡Ribbon -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-ribbon</artifactId>
+        </dependency>
+
+        <!-- erueka中获取注册列表 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+
+        <dependency>
+            <groupId>org.engulf</groupId>
+            <artifactId>springcloud-api</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+    </dependencies>
+```
+
+- 编写配置
+```yml
+server:
+  port: 9001
+
+hystrix:
+  dashboard:
+    proxy-stream-allow-list: "*"
+```
+
+- 启动类开启监控支持
+```java
+@SpringBootApplication
+//开启hystrix监控
+@EnableHystrixDashboard   //服务端要有监控信息的依赖 actuator 完善监控信息，在服务端pom.xml可以找到
+public class DeptConsumerDashboard_9001 {
+    public static void main(String[] args) {
+        SpringApplication.run(DeptConsumerDashboard_9001.class,args);
+    }
+}
+```
+
+
+- **服务端**启动类添加hystrix监控的servlet
+```java
+@SpringBootApplication
+@EnableEurekaClient  //在服务启动后自动注册到Eureka中
+@EnableDiscoveryClient
+//添加对熔断的支持
+@EnableHystrix
+public class HystrixDeptProvider_8001 {
+    public static void main(String[] args) {
+        SpringApplication.run(HystrixDeptProvider_8001.class,args);
+    }
+
+    //增加一个Hystrix监控的 Servlet
+    @Bean
+    public ServletRegistrationBean hystrixMetricsStreamServlet(){
+        ServletRegistrationBean registrationBean = new ServletRegistrationBean(new HystrixMetricsStreamServlet());  //监控
+        registrationBean.addUrlMappings("/actuator/hystrix.stream");
+        return registrationBean;
+    }
+}
+```
