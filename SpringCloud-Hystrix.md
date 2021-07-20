@@ -23,6 +23,7 @@ Hystrix能保证在一个依赖出问题地情况下，不会导致整体服务�
 的调用到一定阈值，缺省是5秒内20次调用失败就会启动熔断机制。熔断机制的注解是@HystrixCommand。  
   
 ## Hystrix使用
+### 服务熔断--(服务端)
 - 导入依赖
 ```xml
 <!-- Hystrix -->
@@ -73,4 +74,58 @@ public class HystrixDeptProvider_8001 {
         SpringApplication.run(HystrixDeptProvider_8001.class,args);
     }
 }
+```
+
+### 服务降级--(客户端)
+- 编写一个降级处理的类(实现FallbackFactory接口)
+```java
+// 服务降级
+@Component
+public class DeptClientServiceFallBackFactory implements FallbackFactory {
+    @Override
+    public DeptClientService create(Throwable throwable) {
+        return new DeptClientService() {
+            @Override
+            public Dept selectById(Integer id) {
+                Dept dept = new Dept();
+                dept.setDeptId(id);
+                dept.setDeptName("id => "+id+"没有对应的信息，客户端提供了降级的信息，这个服务现在已经关闭");
+                dept.setDb_source("没有数据~");
+                return dept;
+            }
+
+            @Override
+            public List<Dept> selectAll() {
+                return null;
+            }
+
+            @Override
+            public int addDept(Dept dept) {
+                return 0;
+            }
+        };
+    }
+}
+```
+
+- 在feign中指定服务降级的类@FeignClient(fallbackFactory = Xxx.class)
+```java
+@FeignClient(value = "SPRINGCLOUD-PROVIDER-DEPT",fallbackFactory = DeptClientServiceFallBackFactory.class)  //从哪个服务拿 //指定服务降级
+public interface DeptClientService {
+    @GetMapping("/dept/{pid}")
+    Dept selectById(@PathVariable("pid") Integer id);
+
+    @GetMapping("/dept/all")
+    List<Dept> selectAll();
+
+    @PostMapping("/dept/add")
+    int addDept(Dept dept);
+}
+
+- 在客户端配置文件中开启降级
+```yml
+# 开启降级 feign.hystrix
+feign:
+  hystrix:
+    enabled: true
 ```
