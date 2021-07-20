@@ -198,7 +198,14 @@ public class DeptConsumerDashboard_9001 {
     }
 }
 ```
-
+- **服务端**要导入监控依赖
+```xml
+<!-- actuator完善监控信息 -->
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-actuator</artifactId>
+</dependency>
+```
 
 - **服务端**启动类添加hystrix监控的servlet
 ```java
