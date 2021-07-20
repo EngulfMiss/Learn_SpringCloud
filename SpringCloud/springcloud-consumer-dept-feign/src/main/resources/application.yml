@@ -6,3 +6,8 @@ eureka:
   client:
     service-url:
       defaultZone: http://eureka7001.com:7001/eureka/,http://eureka7002.com:7002/eureka/,http://eureka7003.com:7003/eureka/  # 哪些注册中心可以提供服务
+      
+# 开启降级 feign.hystrix
+feign:
+  hystrix:
+    enabled: true
