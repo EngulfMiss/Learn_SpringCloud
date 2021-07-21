@@ -1,0 +1,7 @@
+spring:
+  cloud:
+    config:
+      name: config-eureka   # 获取远程的哪个文件
+      label: master
+      uri: http://localhost:3344  # config server的地址
+      profile: dev
