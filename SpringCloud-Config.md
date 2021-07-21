@@ -48,6 +48,8 @@ $ git push origin master
 ```
 
 ## springcloud-config 连接远程服务
+### 服务端
+_____
 - 导入依赖
 ```xml
 <!-- config -->
@@ -84,3 +86,37 @@ public class Config_Server_3344 {
     
 }
 ```
+_____
+### 客户端
+- 导入依赖
+```xml
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-starter-config</artifactId>
+</dependency>
+
+<dependency>
+    <groupId>org.springframework.boot</groupId>
+    <artifactId>spring-boot-starter-web</artifactId>
+</dependency>
+```
+- 系统级配置文件bootstrap.yml
+```yml
+# 系统级别的配置 spring
+spring:
+  cloud:
+    config:
+      uri: http://localhost:3344
+      name: config-client  # 需要从git上读取的资源名称 不需要后缀
+      profile: test
+      label: master
+```
+
+- application.yml
+```yml
+spring:
+  application:
+    name: springcloud-config-client-3355
+```
+
+
