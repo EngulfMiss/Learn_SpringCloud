@@ -1,0 +1,13 @@
+server:
+  port: 3344
+spring:
+  application:
+    name: springcloud-config-server
+
+    # 连接远程仓库
+    # 通过config-server，可以连接到git，访问其中的资源
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://gitee.com/EngulfMiss/springcloud-config.git  # https
