@@ -46,3 +46,41 @@ $ git commit -m "first commit"
 ```git
 $ git push origin master
 ```
+
+## springcloud-config 连接远程服务
+- 导入依赖
+```xml
+<!-- config -->
+<dependency>
+    <groupId>org.springframework.cloud</groupId>
+    <artifactId>spring-cloud-config-server</artifactId>
+</dependency>
+```
+
+- 编写配置文件
+```yml
+server:
+  port: 3344
+spring:
+  application:
+    name: springcloud-config-server
+
+    # 连接远程仓库
+  cloud:
+    config:
+      server:
+        git:
+          uri: https://gitee.com/EngulfMiss/springcloud-config.git
+```
+
+- 主启动类添加@EnableConfigServer注解
+```java
+@SpringBootApplication
+@EnableConfigServer  //开启配置服务
+public class Config_Server_3344 {
+    public static void main(String[] args) {
+        SpringApplication.run(Config_Server_3344.class,args);
+    }
+    
+}
+```
