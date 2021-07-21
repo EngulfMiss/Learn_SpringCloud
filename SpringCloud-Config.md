@@ -20,3 +20,29 @@
 ```git
 $ ssh-keygen -t rsa -C "1216982545@qq.com"
 ```
+
+## GIT 上传文件步骤
+- 进入修改了文件的目录
+```git
+$ cd springcloud-config/
+```
+
+- 加入临时空间
+```git
+$ git add .
+```
+
+- (查看状态)
+```git
+$ git status
+```
+
+- 提交至本地
+```git
+$ git commit -m "first commit"
+```
+
+- 提交至远程
+```git
+$ git push origin master
+```
